@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Human Rights RSS — UN Geneva</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.8rem; }
+    .item { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #ddd; }
+    .item a { font-weight: 600; text-decoration: none; }
+    .item a:hover { text-decoration: underline; }
+    .published { font-size: 0.85rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>UN Geneva – Latest Press Items</h1>
+  <div id="list">Loading…</div>
+
+  <script>
+    async function loadNews() {
+      const container = document.getElementById("list");
+      try {
+        const resp = await fetch("data/normalized/un_geneva_press_items.json");
+        if (!resp.ok) {
+          container.textContent = "Could not load news JSON.";
+          return;
+        }
+        const items = await resp.json();
+        if (!Array.isArray(items) || items.length === 0) {
+          container.textContent = "No items found.";
+          return;
+        }
+
+        container.innerHTML = "";
+        items.slice(0, 20).forEach(item => {
+          const div = document.createElement("div");
+          div.className = "item";
+
+          div.innerHTML = `
+            <a href="${item.link}" target="_blank" rel="noopener noreferrer">
+              ${item.title || "Untitled"}
+            </a>
+            <div class="published">${item.published || ""}</div>
+            <div>${(item.snippet || "").slice(0, 260)}...</div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (e) {
+        console.error(e);
+        container.textContent = "Error loading items.";
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>
